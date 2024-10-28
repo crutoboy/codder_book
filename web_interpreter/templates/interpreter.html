@@ -11,9 +11,6 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit-icons.min.js"></script>
     <!-- cookie js -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <!-- <style>
-        
-    </style> -->
 </head>
 <body>
     <main class="uk-container uk-margin-top">
@@ -45,7 +42,7 @@
             <button id="run" class="uk-button uk-button-primary">Запустить</button>
         </div>
     </main>
-
+    {% csrf_token %}
     <script>
         const csrftoken = Cookies.get('csrftoken');
         console.log(csrftoken)
@@ -87,6 +84,7 @@
             .catch(error => {
                 console.error('Error:', error);
                 document.getElementById('stderr').textContent = 'Ошибка при отправки или получении данных: ' + error;
+                button.disabled = false
             });
     });
     </script>
