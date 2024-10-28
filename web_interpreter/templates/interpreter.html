@@ -11,57 +11,140 @@
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit-icons.min.js"></script>
     <!-- cookie js -->
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    {% load static %}
+    <!-- code_mirror -->
+    <link rel="stylesheet" href="{% static "/code_mirror/lib/codemirror.css" %}">
+    <link rel="stylesheet" href="{% static "/code_mirror/addon/fold/foldgutter.css" %}">
+    <link rel="stylesheet" href="{% static "/code_mirror/addon/dialog/dialog.css" %}">
+    <link rel="stylesheet" href="{% static "/code_mirror/theme/monokai.css" %}">
+    <link rel="stylesheet" href="{% static "/code_mirror/theme/error-theme.css" %}">
+    <script src="{% static "/code_mirror/lib/codemirror.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/search/searchcursor.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/search/search.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/dialog/dialog.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/edit/matchbrackets.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/edit/closebrackets.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/comment/comment.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/wrap/hardwrap.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/fold/foldcode.js" %}"></script>
+    <script src="{% static "/code_mirror/addon/fold/brace-fold.js" %}"></script>
+    <script src="{% static "/code_mirror/keymap/sublime.js" %}"></script>
+    <!-- code_mirror_modes -->
+    <script src="{% static "/code_mirror/mode/javascript/javascript.js" %}"></script>
+    <script src="{% static "/code_mirror/mode/clike/clike.js" %}"></script>
+    <script src="{% static "/code_mirror/mode/python/python.js" %}"></script>
 </head>
 <body>
     <main class="uk-container uk-margin-top">
         <h1>Interpreter</h1>
         <div class="select_language">
-            <select class="uk-select" name="language" id="language">
+            <select class="uk-select" name="language" id="language" onchange="on_change_lang_selection()">
                 <option value="python">python</option>
                 <option value="cpp">c++</option>
             </select>
         </div>
         <div class="uk-container uk-padding-small">
-            <textarea name="code" id="code" class="uk-textarea uk-height-medium"></textarea>
+            <article id="code"></article>
         </div>
         <div class="uk-container uk-flex uk-padding-small">
             <div class="uk-width-1-2 uk-margin-right">
                 <label for="">input:</label>
-                <textarea name="stdin" id="stdin" class="uk-textarea uk-height-small"></textarea>
+                <article id="stdin"></article>
             </div>
             <div class="uk-width-1-2 uk-margin-left">
                 <label for="">output:</label>
-                <textarea name="stdout" id="stdout" class="uk-textarea uk-height-small" readonly></textarea>
+                <article id="stdout"></article>
             </div>
         </div>
         <div class="uk-container uk-padding-small">
             <label for="">error:</label>
-            <textarea name="stderr" id="stderr" class="uk-textarea uk-form-danger" readonly></textarea>
+            <article id="stderr"></article>
         </div>
         <div class="uk-container uk-padding-small uk-flex uk-flex-right">
-            <button id="run" class="uk-button uk-button-primary">Запустить</button>
+            <button id="run" class="uk-button uk-button-primary">Запустить</button> 
         </div>
+        {% csrf_token %}
     </main>
-    {% csrf_token %}
+
+    <script>
+        const python_params = {
+            value: "print('Hello, world!')\n",
+            mode: "python"
+        }
+        const cpp_params = {
+            value: "#include <iostream>\n\nint main()\n{\n    std::cout << \"Hello World!\\n\";\n}\n",
+            mode: "text/x-c++src"
+        }
+        const default_params = {
+            value: "language not support",
+        }
+        function get_params_for_editor(language){
+            switch (language){
+                case "python":
+                    return python_params
+                case "cpp":
+                    return cpp_params
+                default:
+                    return default_params
+            }
+        }
+        function set_options_to_editor(options){
+            Object.entries(options).forEach(([key, value]) => {
+                editor.setOption(key, value)
+            })
+        }
+        function on_change_lang_selection(){
+            set_options_to_editor(
+                get_params_for_editor(
+                    document.getElementById("language").value
+                )
+            )
+        }
+        let editor = CodeMirror(document.getElementById('code'), {
+            lineNumbers: true,
+            keyMap: "sublime",
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            showCursorWhenSelecting: true,
+            theme: "monokai",
+            tabSize: 4
+        })
+
+        let stdin = CodeMirror(document.getElementById('stdin'), {
+            lineNumbers: true,
+            showCursorWhenSelecting: true,
+            theme: "monokai",
+        })
+        let stdout = CodeMirror(document.getElementById('stdout'), {
+            lineNumbers: true,
+            theme: "monokai",
+            readOnly: true,
+        })
+        let stderr = CodeMirror(document.getElementById('stderr'), {
+            lineNumbers: true,
+            theme: "error-theme",
+            readOnly: true,
+        })
+
+        on_change_lang_selection()
+    </script>
+
     <script>
         const csrftoken = Cookies.get('csrftoken');
-        console.log(csrftoken)
-
         const button = document.getElementById('run')
         button.addEventListener('click', function (event) {
-
             button.disabled = true
 
             // Получаем данные из объектов с id language, code, input
             const language = document.getElementById('language').value;
-            const code = document.getElementById('code').value;
-            const stdin = document.getElementById('stdin').value;
+            const code = editor.getValue();
+            const input = stdin.getValue();
 
             // Формируем объект для отправки на сервер
             const data = {
                 language: language,
                 code: code,
-                input: stdin
+                input: input
             };
 
             // Отправляем данные на сервер с помощью fetch
@@ -75,17 +158,18 @@
             })
             .then(response => response.json())
             .then(result => {
-                button.disabled = false
                 console.log(result)
                 // Помещаем полученные данные в объекты с id output и error
-                document.getElementById('stdout').textContent = result.stdout;
-                document.getElementById('stderr').textContent = result.stderr;
+                stdout.setValue(result.stdout)
+                stderr.setValue(result.stderr)
             })
             .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('stderr').textContent = 'Ошибка при отправки или получении данных: ' + error;
+                console.error(error);
+                stderr.setValue("Ошибка связи с сервером\nПопробуйте отправить данные ещё раз или перезапустите страницу\nПодробности:\т" + result.stderr)
+            })
+            .finally(
                 button.disabled = false
-            });
+            );
     });
     </script>
 </body>
