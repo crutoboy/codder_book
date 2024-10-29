@@ -167,9 +167,10 @@
                 console.error(error);
                 stderr.setValue("Ошибка связи с сервером\nПопробуйте отправить данные ещё раз или перезапустите страницу\nПодробности:\т" + result.stderr)
             })
-            .finally(
+            .finally(() => {
                 button.disabled = false
-            );
+            }
+        );
     });
     </script>
 </body>
