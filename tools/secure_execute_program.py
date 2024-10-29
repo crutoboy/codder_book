@@ -35,7 +35,10 @@ def execute_python_proram(program: str, stdin: str, \
         'python:3.10-slim',
         'python', '-c', program
     ]
-    proc = subprocess.run(cmd, input=stdin, text=True, timeout=timeout, capture_output=True)
+    try:
+        proc = subprocess.run(cmd, input=stdin, text=True, timeout=timeout, capture_output=True)
+    except:
+        return ('', f'executing error:\ntimeout error ({timeout}s)')
     return (proc.stdout, proc.stderr)
 
 def compile_cpp_program(program: str, compile_file: str, \
@@ -66,7 +69,10 @@ def compile_cpp_program(program: str, compile_file: str, \
         'gcc:latest',
         "g++", "-x", "c++", "-", "-o", f'/usr/src/app/{compile_file}'
     ]
-    proc = subprocess.run(cmd, input=program, text=True, timeout=timeout, capture_output=True)
+    try:
+        proc = subprocess.run(cmd, input=program, text=True, timeout=timeout, capture_output=True)
+    except:
+        return (id_program, '', f'compile error:\ntimeout error ({timeout}s)')
     return (id_program, proc.stdout, proc.stderr)
 
 def execute_cpp_proram(program: str, stdin: str, \
@@ -103,7 +109,10 @@ def execute_cpp_proram(program: str, stdin: str, \
         '-v', f'{path_to_program}:/usr/src/app',
         'gcc:latest', f'/usr/src/app/{compile_file}'
     ]
-    proc = subprocess.run(cmd, input=stdin, text=True, timeout=timeout, capture_output=True)
+    try:
+        proc = subprocess.run(cmd, input=stdin, text=True, timeout=timeout, capture_output=True)
+    except:
+        return (id_program, '', f'executing error:\ntimeout error ({timeout}s)')
     return (id_program, proc.stdout, proc.stderr)
 
 def start_program(program: str, stdin: str = '', language: str = 'python', \
