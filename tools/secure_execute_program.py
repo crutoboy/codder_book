@@ -2,28 +2,23 @@ import os
 import subprocess
 from uuid import uuid4
 
-# default value
-DEFAULT_CPU = 0.5
-DEFAULT_MEMORY = '512m'
-DEFAULT_TIMEOUT = 5
-WORKSPACE = './workspace'
+from .config import DEFAULT_CPU, DEFAULT_MEMORY, DEFAULT_TIMEOUT, WORKSPACE
 
 
 def execute_python_proram(program: str, stdin: str, \
-    cpu=DEFAULT_CPU, memory=DEFAULT_MEMORY, timeout=DEFAULT_TIMEOUT) -> tuple[str, str]:
+    cpu:float=DEFAULT_CPU, memory:float=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str]:
     """
-    Запуск python скрипта в докере
+    Выполняет Python скрипт в изолированном Docker-контейнере с ограничениями.
 
     Параметры:
-    program: str - код программы
-    stdin: str - входные данные
-    cpu - параметр докера для ограничения процессорной мощности
-    memory - параметр докера для ограничения ОЗУ
-    timeout - параметр запуска программу для ограничения времени исполнения
+    - program (str): Код программы на Python.
+    - stdin (str): Входные данные, подаваемые программе.
+    - cpu (float): Ограничение на использование процессора в контейнере.
+    - memory (float): Ограничение на использование памяти в контейнере.
+    - timeout (float): Лимит времени выполнения программы в секундах.
 
     Результат:
-    Кортеж выходных данных и ошибок
-    tupte(stdout, stderr)
+    tuple[str, str]: Кортеж (stdout, stderr) с результатом выполнения и сообщениями об ошибках.
     """
 
     cmd = [
@@ -37,24 +32,25 @@ def execute_python_proram(program: str, stdin: str, \
     ]
     try:
         proc = subprocess.run(cmd, input=stdin, text=True, timeout=timeout, capture_output=True)
-    except:
+    except subprocess.TimeoutExpired:
         return ('', f'executing error:\ntimeout error ({timeout}s)')
     return (proc.stdout, proc.stderr)
 
 def compile_cpp_program(program: str, compile_file: str, \
-    cpu=DEFAULT_CPU, memory=DEFAULT_MEMORY, timeout=DEFAULT_TIMEOUT) -> tuple[str, str, str]:
+    cpu:float=DEFAULT_CPU, memory:float=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str, str]:
     """
-    Компиляция кода на c++ и возврат имени исполняемого файла
+    Компилирует C++ программу и возвращает ID программы и информацию об ошибках.
 
     Параметры:
-    program: str - код программы
-    cpu - параметр докера для ограничения процессорной мощности
-    memory - параметр докера для ограничения ОЗУ
-    timeout - параметр запуска программу для ограничения времени исполнения
+    - program (str): Код программы на C++.
+    - compile_file (str): Имя для скомпилированного файла.
+    - cpu (float): Ограничение на использование процессора.
+    - memory (float): Ограничение на использование памяти.
+    - timeout (float): Лимит времени компиляции.
 
     Результат:
-    Кортеж выходных данных и ошибок
-    tupte(id_program, stdout, stderr)
+    tuple[str, str, str]: Кортеж (id_program, stdout, stderr), где id_program — ID папки с программой,
+                          stdout — стандартный вывод, stderr — сообщения об ошибках.
     """
     id_program = str(uuid4())
     path_to_program = os.path.join(WORKSPACE, id_program)
@@ -71,25 +67,25 @@ def compile_cpp_program(program: str, compile_file: str, \
     ]
     try:
         proc = subprocess.run(cmd, input=program, text=True, timeout=timeout, capture_output=True)
-    except:
+    except subprocess.TimeoutExpired:
         return (id_program, '', f'compile error:\ntimeout error ({timeout}s)')
     return (id_program, proc.stdout, proc.stderr)
 
 def execute_cpp_proram(program: str, stdin: str, \
-    cpu=DEFAULT_CPU, memory=DEFAULT_MEMORY, timeout=DEFAULT_TIMEOUT) -> tuple[str, str, str]:
+    cpu:float=DEFAULT_CPU, memory:float=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str, str]:
     """
-    Компиляция и запуск кода на c++
+    Компилирует и выполняет программу на C++ в изолированном контейнере.
 
     Параметры:
-    program: str - код программы
-    stdin: str - входные данные
-    cpu - параметр докера для ограничения процессорной мощности
-    memory - параметр докера для ограничения ОЗУ
-    timeout - параметр запуска программу для ограничения времени исполнения
+    - program (str): Код программы на C++.
+    - stdin (str): Входные данные для программы.
+    - cpu (float): Ограничение на использование процессора.
+    - memory (float): Ограничение на использование памяти.
+    - timeout (float): Лимит времени выполнения.
 
     Результат:
-    Кортеж выходных данных и ошибок
-    tupte(id_program, stdout, stderr)
+    tuple[str, str, str]: Кортеж (id_program, stdout, stderr), где id_program — ID папки с программой,
+                          stdout — стандартный вывод, stderr — сообщения об ошибках.
     """
     compile_file = 'cpp_program'
     id_program, compile_stdout, compile_stderr = compile_cpp_program(program, compile_file, cpu, memory, timeout)
@@ -111,27 +107,25 @@ def execute_cpp_proram(program: str, stdin: str, \
     ]
     try:
         proc = subprocess.run(cmd, input=stdin, text=True, timeout=timeout, capture_output=True)
-    except:
+    except subprocess.TimeoutExpired:
         return (id_program, '', f'executing error:\ntimeout error ({timeout}s)')
     return (id_program, proc.stdout, proc.stderr)
 
 def start_program(program: str, stdin: str = '', language: str = 'python', \
-    cpu=DEFAULT_CPU, memory=DEFAULT_MEMORY, timeout=DEFAULT_TIMEOUT) -> tuple[str, str]:
+    cpu:float=DEFAULT_CPU, memory:float=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str]:
     """
-    Безопасный запуск программ на различных языках программирования
+    Выполняет программы на различных языках программирования в изолированном окружении.
 
     Параметры:
-    program: str - код программы
-    stdin: str - входные данные
-    language: str - язык программирования, на котором написана прграмма
-     Доступные значения: python, cpp
-    cpu - параметр докера для ограничения процессорной мощности
-    memory - параметр докера для ограничения ОЗУ
-    timeout - параметр запуска программу для ограничения времени исполнения
+    - program (str): Код программы.
+    - stdin (str): Входные данные.
+    - language (str): Язык программирования (поддерживается: 'python', 'cpp').
+    - cpu (float): Ограничение на использование процессора.
+    - memory (float): Ограничение на использование памяти.
+    - timeout (float): Лимит времени выполнения.
 
     Результат:
-    Кортеж выходных данных и ошибок
-    tupte(stdout, stderr)
+    tuple[str, str]: Кортеж (stdout, stderr) с результатами выполнения и сообщениями об ошибках.
     """
 
     if language == 'python':
