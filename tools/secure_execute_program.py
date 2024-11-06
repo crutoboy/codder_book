@@ -92,9 +92,9 @@ def execute_cpp_proram(program: str, stdin: str, \
     path_to_program = os.path.join(WORKSPACE, id_program)
 
     if compile_stderr != '':
-        return ('', 'compile error:\n' + compile_stderr)
+        return (id_program,'', 'compile error:\n' + compile_stderr)
     if not os.path.isfile(os.path.join(path_to_program, compile_file)):
-        return ('', 'compile error:\ncompiling file not exists')
+        return (id_program, '', 'compile error:\ncompiling file not exists')
 
     cmd = [
         'docker', 'run', '--rm', '-i',
