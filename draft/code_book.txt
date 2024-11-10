@@ -1,0 +1,11 @@
+выполнение программы
+ne - no error
+ce - compile error
+re - runtime error
+
+результаты тестирования
+ra - right answer
+wa - wrong answer
+ce - compile error
+re - runtime error
+se - server error
