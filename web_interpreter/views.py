@@ -3,7 +3,7 @@ import json
 from django.shortcuts import render
 from django.http import JsonResponse
 
-from tools import secure_execute_program
+from executing_program import secure_execute_program
 
 # API
 def execute_code(request):
@@ -11,8 +11,8 @@ def execute_code(request):
     lang = data.get('language')
     code = data.get('code')
     stdin = data.get('input')
-    stdout, stderr = secure_execute_program.start_program(code, stdin, lang)
-    return JsonResponse({'stdout': stdout, 'stderr': stderr})
+    stdout, stderr, status_code = secure_execute_program.start_program(code, stdin, lang)
+    return JsonResponse({'stdout': stdout, 'stderr': stderr, 'status_code': status_code})
 
 # Create your views here.
 def interpreter(request):
