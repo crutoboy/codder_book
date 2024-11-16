@@ -3,10 +3,8 @@ import subprocess
 from .. import workspace_tool
 from ..config import DEFAULT_CPU, DEFAULT_MEMORY, DEFAULT_TIMEOUT
 
-
-
-def execute_python_proram(program: str, stdin: str, \
-    cpu:float=DEFAULT_CPU, memory:int=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str]:
+def execute_python_program(program: str, stdin: str, \
+    cpu: float = DEFAULT_CPU, memory: int = DEFAULT_MEMORY, timeout: float = DEFAULT_TIMEOUT) -> tuple[str, str, str]:
     """
     Выполняет Python скрипт в изолированном Docker-контейнере с ограничениями.
 
@@ -17,10 +15,12 @@ def execute_python_proram(program: str, stdin: str, \
     - memory (int): Ограничение на использование памяти в контейнере в мегабайтах.
     - timeout (float): Лимит времени выполнения программы в секундах.
 
-    Результат:
-    tuple[str, str]: Кортеж (stdout, stderr) с результатом выполнения и сообщениями об ошибках.
+    Возвращает:
+    tuple[str, str, str]: Кортеж (stdout, stderr, status), где:
+                          - stdout (str): Стандартный вывод программы.
+                          - stderr (str): Сообщения об ошибках выполнения.
+                          - status (str): Статус выполнения ('re' при ошибке выполнения, 'ne' при успешном выполнении).
     """
-
     cmd = [
         'docker', 'run', '--rm', '-i',
         f'--cpus={cpu}',
@@ -33,7 +33,9 @@ def execute_python_proram(program: str, stdin: str, \
     try:
         proc = subprocess.run(cmd, input=stdin, text=True, timeout=timeout, capture_output=True)
     except subprocess.TimeoutExpired:
-        return ('', f'executing error:\ntimeout error ({timeout}s)', 're')
+        return ('', f'execution error:\ntimeout error ({timeout}s)', 're')
+
     if proc.returncode != 0:
         return (proc.stdout, proc.stderr, 're')
+    
     return (proc.stdout, proc.stderr, 'ne')

@@ -3,27 +3,26 @@ import subprocess
 from .. import workspace_tool
 from ..config import DEFAULT_CPU, DEFAULT_MEMORY, DEFAULT_TIMEOUT
 
-
 COMPILING_FILE_NAME = 'compile_cpp_program'
 
-
 def compile_cpp_program(program: str, workspace_id: str, \
-    cpu:float=DEFAULT_CPU, memory:int=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str, str]:
+    cpu: float = DEFAULT_CPU, memory: int = DEFAULT_MEMORY, timeout: float = DEFAULT_TIMEOUT) -> tuple[str, str, str]:
     """
     Компилирует C++ программу и возвращает ID программы и информацию об ошибках.
 
     Параметры:
     - program (str): Код программы на C++.
-    - compile_file (str): Имя для скомпилированного файла.
+    - workspace_id (str): ID рабочего пространства, где будет происходить компиляция.
     - cpu (float): Ограничение на использование процессора.
     - memory (int): Ограничение на использование памяти в мегабайтах.
-    - timeout (float): Лимит времени компиляции.
+    - timeout (float): Лимит времени компиляции в секундах.
 
-    Результат:
-    tuple[str, str, str]: Кортеж (id_program, stdout, stderr), где id_program — ID папки с программой,
-                          stdout — стандартный вывод, stderr — сообщения об ошибках.
+    Возвращает:
+    tuple[str, str, str]: Кортеж (stdout, stderr, returncode), где:
+                          - stdout (str): Стандартный вывод процесса компиляции.
+                          - stderr (str): Сообщения об ошибках компиляции.
+                          - returncode (str): Код возврата процесса.
     """
-
     path_to_workspace = workspace_tool.get_path_to_workspace(workspace_id)
 
     cmd = [
@@ -41,11 +40,24 @@ def compile_cpp_program(program: str, workspace_id: str, \
         return ('', f'compile error:\ntimeout error ({timeout}s)', 'ce')
     return (proc.stdout, proc.stderr, proc.returncode)
 
-
 def run_cpp_program(workspace_id: str, stdin: str, \
-    cpu:float=DEFAULT_CPU, memory:int=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str, str]:
-    """запуск c++ программы"""
+    cpu: float = DEFAULT_CPU, memory: int = DEFAULT_MEMORY, timeout: float = DEFAULT_TIMEOUT) -> tuple[str, str, str]:
+    """
+    Запускает скомпилированную C++ программу и возвращает результат выполнения.
 
+    Параметры:
+    - workspace_id (str): ID рабочего пространства, где хранится скомпилированная программа.
+    - stdin (str): Входные данные для программы.
+    - cpu (float): Ограничение на использование процессора.
+    - memory (int): Ограничение на использование памяти в мегабайтах.
+    - timeout (float): Лимит времени выполнения в секундах.
+
+    Возвращает:
+    tuple[str, str, str]: Кортеж (stdout, stderr, returncode), где:
+                          - stdout (str): Стандартный вывод программы.
+                          - stderr (str): Сообщения об ошибках выполнения.
+                          - returncode (str): Код возврата процесса.
+    """
     path_to_workspace = workspace_tool.get_path_to_workspace(workspace_id)
 
     cmd = [
@@ -63,20 +75,35 @@ def run_cpp_program(workspace_id: str, stdin: str, \
         return ('', f'runtime error:\ntimeout error ({timeout}s)', 're')
     return (proc.stdout, proc.stderr, proc.returncode)
 
+def execute_cpp_program(program: str, stdin: str, \
+    cpu: float = DEFAULT_CPU, memory: int = DEFAULT_MEMORY, timeout: float = DEFAULT_TIMEOUT) -> tuple[str, str, str]:
+    """
+    Компилирует и выполняет C++ программу, возвращает результат выполнения.
 
-def execute_cpp_proram(program: str, stdin: str, \
-    cpu:float=DEFAULT_CPU, memory:int=DEFAULT_MEMORY, timeout:float=DEFAULT_TIMEOUT) -> tuple[str, str, str]:
+    Параметры:
+    - program (str): Код программы на C++.
+    - stdin (str): Входные данные для программы.
+    - cpu (float): Ограничение на использование процессора.
+    - memory (int): Ограничение на использование памяти в мегабайтах.
+    - timeout (float): Лимит времени выполнения в секундах.
 
-    id_workspace = workspace_tool.create_workspace() # создания пространства для сохранения временных файлов для исполнения программы
+    Возвращает:
+    tuple[str, str, str]: Кортеж (stdout, stderr, status), где:
+                          - stdout (str): Стандартный вывод выполнения программы.
+                          - stderr (str): Сообщения об ошибках выполнения или компиляции.
+                          - status (str): Статус выполнения ('ce' для ошибок компиляции,
+                                          're' для ошибок выполнения, 'ne' при успешном выполнении).
+    """
+    id_workspace = workspace_tool.create_workspace()  # Создание рабочего пространства для временных файлов
 
     compile_stdout, compile_stderr, compile_returncode = compile_cpp_program(program, id_workspace, cpu, memory, timeout)
     if compile_returncode != 0:
-        workspace_tool.del_workspace(id_workspace) # удаление временного пространства с промежуточными файлами
+        workspace_tool.del_workspace(id_workspace)  # Удаление рабочего пространства при ошибке компиляции
         return (compile_stdout, compile_stderr, 'ce')
 
     exec_stdout, exec_stderr, exec_returncode = run_cpp_program(id_workspace, stdin, cpu, memory, timeout)
 
-    workspace_tool.del_workspace(id_workspace) # удаление временного пространства с промежуточными файлами
+    workspace_tool.del_workspace(id_workspace)  # Удаление рабочего пространства после выполнения программы
 
     if exec_returncode != 0:
         return (exec_stdout, exec_stderr, 're')
