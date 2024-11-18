@@ -1,6 +1,5 @@
 import subprocess
 
-from .. import workspace_tool
 from ..config import DEFAULT_CPU, DEFAULT_MEMORY, DEFAULT_TIMEOUT
 
 def execute_python_program(program: str, stdin: str, \
