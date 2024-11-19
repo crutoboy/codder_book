@@ -41,6 +41,7 @@
             <select class="uk-select" name="language" id="language" onchange="on_change_lang_selection()">
                 <option value="python">python</option>
                 <option value="cpp">c++</option>
+                <option value="java">java</option>
             </select>
         </div>
         <div class="uk-container uk-padding-small">
@@ -75,6 +76,10 @@
             value: "#include <iostream>\n\nint main()\n{\n    std::cout << \"Hello World!\\n\";\n}\n",
             mode: "text/x-c++src"
         }
+        const java_params = {
+            value: "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n",
+            mode: "text/x-java"
+        }
         const default_params = {
             value: "language not support",
         }
@@ -84,6 +89,8 @@
                     return python_params
                 case "cpp":
                     return cpp_params
+                case "java":
+                    return java_params
                 default:
                     return default_params
             }
