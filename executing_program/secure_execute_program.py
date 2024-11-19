@@ -33,5 +33,8 @@ def start_program(program: str, stdin: str = '', language: str = 'python', \
     elif language == 'java':
         stdout, stderr, status_code = programing_languages.java_exec.execute_java_program(program, stdin, cpu, memory, timeout)
         return (stdout, stderr, status_code)
+    elif language == 'c':
+        stdout, stderr, status_code = programing_languages.c_exec.execute_c_program(program, stdin, cpu, memory, timeout)
+        return (stdout, stderr, status_code)
     else:
         return ('', 'Error: language not supported', None)

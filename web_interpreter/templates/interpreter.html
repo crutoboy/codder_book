@@ -13,26 +13,26 @@
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     {% load static %}
     <!-- code_mirror -->
-    <link rel="stylesheet" href="{% static "/code_mirror/lib/codemirror.css" %}">
-    <link rel="stylesheet" href="{% static "/code_mirror/addon/fold/foldgutter.css" %}">
-    <link rel="stylesheet" href="{% static "/code_mirror/addon/dialog/dialog.css" %}">
-    <link rel="stylesheet" href="{% static "/code_mirror/theme/monokai.css" %}">
-    <link rel="stylesheet" href="{% static "/code_mirror/theme/error-theme.css" %}">
-    <script src="{% static "/code_mirror/lib/codemirror.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/search/searchcursor.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/search/search.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/dialog/dialog.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/edit/matchbrackets.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/edit/closebrackets.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/comment/comment.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/wrap/hardwrap.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/fold/foldcode.js" %}"></script>
-    <script src="{% static "/code_mirror/addon/fold/brace-fold.js" %}"></script>
-    <script src="{% static "/code_mirror/keymap/sublime.js" %}"></script>
+    <link rel="stylesheet" href="..{% static "/code_mirror/lib/codemirror.css" %}">
+    <link rel="stylesheet" href="..{% static "/code_mirror/addon/fold/foldgutter.css" %}">
+    <link rel="stylesheet" href="..{% static "/code_mirror/addon/dialog/dialog.css" %}">
+    <link rel="stylesheet" href="..{% static "/code_mirror/theme/monokai.css" %}">
+    <link rel="stylesheet" href="..{% static "/code_mirror/theme/error-theme.css" %}">
+    <script src="..{% static "/code_mirror/lib/codemirror.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/search/searchcursor.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/search/search.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/dialog/dialog.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/edit/matchbrackets.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/edit/closebrackets.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/comment/comment.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/wrap/hardwrap.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/fold/foldcode.js" %}"></script>
+    <script src="..{% static "/code_mirror/addon/fold/brace-fold.js" %}"></script>
+    <script src="..{% static "/code_mirror/keymap/sublime.js" %}"></script>
     <!-- code_mirror_modes -->
-    <script src="{% static "/code_mirror/mode/javascript/javascript.js" %}"></script>
-    <script src="{% static "/code_mirror/mode/clike/clike.js" %}"></script>
-    <script src="{% static "/code_mirror/mode/python/python.js" %}"></script>
+    <script src="..{% static "/code_mirror/mode/javascript/javascript.js" %}"></script>
+    <script src="..{% static "/code_mirror/mode/clike/clike.js" %}"></script>
+    <script src="..{% static "/code_mirror/mode/python/python.js" %}"></script>
 </head>
 <body>
     <main class="uk-container uk-margin-top">
@@ -41,6 +41,7 @@
             <select class="uk-select" name="language" id="language" onchange="on_change_lang_selection()">
                 <option value="python">python</option>
                 <option value="cpp">c++</option>
+                <option value="c">c</option>
                 <option value="java">java</option>
             </select>
         </div>
@@ -80,6 +81,10 @@
             value: "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n",
             mode: "text/x-java"
         }
+        const c_params = {
+            value: "#include <stdio.h> int main() { printf(\"Hello, World!\\n\"); return 0; }",
+            mode: "text/x-csrc"
+        }
         const default_params = {
             value: "language not support",
         }
@@ -89,6 +94,8 @@
                     return python_params
                 case "cpp":
                     return cpp_params
+                case "c":
+                    return c_params
                 case "java":
                     return java_params
                 default:
