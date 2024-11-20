@@ -36,5 +36,8 @@ def start_program(program: str, stdin: str = '', language: str = 'python', \
     elif language == 'c':
         stdout, stderr, status_code = programing_languages.c_exec.execute_c_program(program, stdin, cpu, memory, timeout)
         return (stdout, stderr, status_code)
+    elif language == 'js':
+        stdout, stderr, status_code = programing_languages.js_exec.execute_js_program(program, stdin, cpu, memory, timeout)
+        return (stdout, stderr, status_code)
     else:
         return ('', 'Error: language not supported', None)

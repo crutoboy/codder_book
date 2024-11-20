@@ -39,10 +39,11 @@
         <h1>Interpreter</h1>
         <div class="select_language">
             <select class="uk-select" name="language" id="language" onchange="on_change_lang_selection()">
-                <option value="python">python</option>
-                <option value="cpp">c++</option>
-                <option value="c">c</option>
-                <option value="java">java</option>
+                <option value="python">Python</option>
+                <option value="cpp">C++</option>
+                <option value="c">C</option>
+                <option value="java">Java</option>
+                <option value="js">JavaScript</option>
             </select>
         </div>
         <div class="uk-container uk-padding-small">
@@ -85,6 +86,10 @@
             value: "#include <stdio.h> int main() { printf(\"Hello, World!\\n\"); return 0; }",
             mode: "text/x-csrc"
         }
+        const js_params = {
+            value: "console.log('Hello, World!');",
+            mode: "text/javascript"
+        }
         const default_params = {
             value: "language not support",
         }
@@ -98,6 +103,8 @@
                     return c_params
                 case "java":
                     return java_params
+                case "js":
+                    return js_params
                 default:
                     return default_params
             }
