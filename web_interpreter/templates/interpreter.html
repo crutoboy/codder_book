@@ -40,12 +40,6 @@
         <h1>Interpreter</h1>
         <div class="select_language">
             <select class="uk-select" name="language" id="language" onchange="on_change_lang_selection()">
-                <option value="python">Python</option>
-                <option value="cpp">C++</option>
-                <option value="c">C</option>
-                <option value="java">Java</option>
-                <option value="js">JavaScript</option>
-                <option value="rust">Rust</option>
             </select>
         </div>
         <div class="uk-container uk-padding-small">
@@ -72,56 +66,45 @@
     </main>
 
     <script>
-        const python_params = {
-            value: "print('Hello, world!')\n",
-            mode: "python"
+        let modes_for_lang = {
+            python: "python",
+            cpp: "text/x-c++src",
+            java: "text/x-java",
+            c: "text/x-csrc",
+            js: "text/javascript",
+            rust: "text/x-rustsrc",
+            default: "none"
         }
-        const cpp_params = {
-            value: "#include <iostream>\n\nint main()\n{\n    std::cout << \"Hello World!\\n\";\n}\n",
-            mode: "text/x-c++src"
+
+        let hello_world_programs = {
+            python: "print('Hello, world!')\n",
+            cpp: "#include <iostream>\n\nint main()\n{\n    std::cout << \"Hello World!\\n\";\n}\n",
+            java: "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n",
+            c: "#include <stdio.h>\n\nint main() {\n    printf(\"Hello, World!\\n\");\n    return 0;\n}\n",
+            js: "console.log('Hello, World!');",
+            rust: "fn main() {\n    println!(\"Hello, world!\")\;\n}\n",
+            default: "language not support",
         }
-        const java_params = {
-            value: "public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, World!\");\n    }\n}\n",
-            mode: "text/x-java"
+
+        let human_read_languages = {
+            python: "Python",
+            cpp: "C++",
+            c: "C",
+            java: "Java",
+            js: "JavaScript",
+            rust: "Rust"
         }
-        const c_params = {
-            value: "#include <stdio.h>\n\nint main() {\n    printf(\"Hello, World!\\n\");\n    return 0;\n}\n",
-            mode: "text/x-csrc"
+
+        function get_params_for_editor(language, default_programs = hello_world_programs, modes = modes_for_lang){
+            return {value: default_programs[language], mode: modes[language]}
         }
-        const js_params = {
-            value: "console.log('Hello, World!');",
-            mode: "text/javascript"
-        }
-        const rust_params = {
-            value: "fn main() {\n    println!(\"Hello, world!\")\;\n}\n",
-            mode: "text/x-rustsrc"
-        }
-        const default_params = {
-            value: "language not support",
-        }
-        function get_params_for_editor(language){
-            switch (language){
-                case "python":
-                    return python_params
-                case "cpp":
-                    return cpp_params
-                case "c":
-                    return c_params
-                case "java":
-                    return java_params
-                case "js":
-                    return js_params
-                case "rust":
-                    return rust_params
-                default:
-                    return default_params
-            }
-        }
+
         function set_options_to_editor(options){
             Object.entries(options).forEach(([key, value]) => {
                 editor.setOption(key, value)
             })
         }
+
         function on_change_lang_selection(){
             set_options_to_editor(
                 get_params_for_editor(
@@ -129,6 +112,7 @@
                 )
             )
         }
+
         let editor = CodeMirror(document.getElementById('code'), {
             lineNumbers: true,
             keyMap: "sublime",
@@ -144,17 +128,32 @@
             showCursorWhenSelecting: true,
             theme: "monokai",
         })
+
         let stdout = CodeMirror(document.getElementById('stdout'), {
             lineNumbers: true,
             theme: "monokai",
             readOnly: true,
         })
+
         let stderr = CodeMirror(document.getElementById('stderr'), {
             lineNumbers: true,
             theme: "error-theme",
             readOnly: true,
         })
 
+
+        function create_lang_selection(){
+            let select = document.getElementById('language')
+
+            for (let lang in human_read_languages) {
+                let option = document.createElement('option')
+                option.value = lang
+                option.textContent = human_read_languages[lang]
+                select.appendChild(option)
+            }
+        }
+
+        create_lang_selection()
         on_change_lang_selection()
     </script>
 
