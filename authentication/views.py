@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 
@@ -48,3 +48,7 @@ def signup(request):
         return redirect('login')  # Перенаправление после успешной регистрации
 
     return render(request, 'signup.html')
+
+def logout_(request):
+    logout(request)
+    return redirect('/')
