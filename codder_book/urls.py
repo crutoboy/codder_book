@@ -17,8 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from test_home_page.views import index
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('interpreter/', include('web_interpreter.urls'))
+    path('', index),
+    path('interpreter/', include('web_interpreter.urls')),
+    path('login/', include('authentication.urls'))
 ]

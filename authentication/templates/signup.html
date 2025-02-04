@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SignIn</title>
+  <!-- ui-kit css -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/css/uikit.min.css" />
+  <!-- ui-kit js -->
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.21.13/dist/js/uikit-icons.min.js"></script>
+  <!-- cookie js -->
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+</head>
+
+<body>
+  <div class="uk-container">
+    <div class="uk-container uk-flex uk-flex-center uk-flex-middle" style="min-height: 100vh;">
+      <form method="post">
+        {% csrf_token %}
+        <div class="uk-margin">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon" uk-icon="icon: user"></span>
+            <input class="uk-input" type="text" id="username" name="username" placeholder="Имя пользователя">
+          </div>
+        </div>
+        <div class="uk-margin">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon" uk-icon="icon: mail"></span>
+            <input class="uk-input" type="email" id="mail" name="mail" placeholder="Email">
+          </div>
+        </div>
+        <div class="uk-margin">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon" uk-icon="icon: lock"></span>
+            <button class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: eye" id="visible_password" style="z-index: 100;"></button>
+            <input class="uk-input" type="password" id="password1" name="password1" placeholder="Пароль">
+          </div>
+        </div>
+        <div class="uk-margin">
+          <div class="uk-inline uk-width-1-1">
+            <span class="uk-form-icon" uk-icon="icon: lock"></span>
+            <!-- <button class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: eye" id="visible_password" style="z-index: 100;"></button> -->
+            <input class="uk-input" type="password" id="password2" name="password2" placeholder="Подтвердите пароль">
+          </div>
+        </div>
+        <div class="uk-margin uk-width-1-1">
+          <div class="uk-inline uk-width-1-1">
+            <input class="uk-input uk-button uk-button-primary" type="submit" value="Зарегистрироваться">
+          </div>
+        </div>
+        <div class="uk-margin uk-width-1-1">
+          <div class="uk-inline">
+            <p>Есть аккаунта? <a href="../signin/">Войдите</a></p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% load static %}
+  <script src="../..{% static "/js/hide_visible_password.js" %}"></script>
+  <script>
+    // скрытие/открытие пароля
+    let visible_password_btn1 = document.getElementById('visible_password1')
+    let password_field1 = document.getElementById('password1')
+    hide_visible_password(visible_password_btn1, password_field1)
+  </script>
+</body>
+
+</html>
