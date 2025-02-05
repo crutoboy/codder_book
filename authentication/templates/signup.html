@@ -16,7 +16,7 @@
 
 <body>
   <div class="uk-container">
-    <div class="uk-container uk-flex uk-flex-center uk-flex-middle" style="min-height: 100vh;">
+    <div class="uk-container uk-container-xsmall uk-flex uk-flex-center uk-flex-middle" style="min-height: 100vh;">
       <form method="post">
         {% csrf_token %}
         <div class="uk-margin">
@@ -34,17 +34,28 @@
         <div class="uk-margin">
           <div class="uk-inline uk-width-1-1">
             <span class="uk-form-icon" uk-icon="icon: lock"></span>
-            <button class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: eye" id="visible_password" style="z-index: 100;"></button>
+            <button class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: eye" id="visible_password"
+              style="z-index: 100;"></button>
             <input class="uk-input" type="password" id="password1" name="password1" placeholder="Пароль">
           </div>
         </div>
         <div class="uk-margin">
           <div class="uk-inline uk-width-1-1">
             <span class="uk-form-icon" uk-icon="icon: lock"></span>
-            <!-- <button class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: eye" id="visible_password" style="z-index: 100;"></button> -->
             <input class="uk-input" type="password" id="password2" name="password2" placeholder="Подтвердите пароль">
           </div>
         </div>
+        {% if messages %}
+          <div class="uk-margin uk-width-1-1">
+            <div class="uk-inline uk-width-1-1">
+              <ul class="uk-list uk-list-hyphen">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
         <div class="uk-margin uk-width-1-1">
           <div class="uk-inline uk-width-1-1">
             <input class="uk-input uk-button uk-button-primary" type="submit" value="Зарегистрироваться">
@@ -60,7 +71,7 @@
   </div>
 
   {% load static %}
-  <script src="../..{% static "/js/hide_visible_password.js" %}"></script>
+  <script src="../..{% static " /js/hide_visible_password.js" %}"></script>
   <script>
     // скрытие/открытие пароля
     let visible_password_btn1 = document.getElementById('visible_password1')

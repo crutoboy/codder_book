@@ -8,15 +8,13 @@ def signin(request):
     if request.method == "POST":
         username = request.POST.get('user')
         password = request.POST.get('password')
-        print(username, password)
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            print(1)
             return redirect('/')
         else:
-            print(2)
-            return render(request, 'signin.html')
+            messages.error(request, 'Неверное имя или пароль')
+            return redirect('login')
     return render(request, 'signin.html')
 
 def signup(request):
@@ -30,13 +28,11 @@ def signup(request):
         # Проверка на совпадение паролей
         if password != password2:
             messages.error(request, 'Пароли не совпадают')
-            print('Пароли не совпадают')
             return redirect('register')
 
         # Проверка на уникальность имени пользователя
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Пользователь с таким именем уже существует')
-            print('Пользователь с таким именем уже существует')
             return redirect('register')
 
         # Создаем нового пользователя
@@ -44,7 +40,6 @@ def signup(request):
         user.save()
 
         messages.success(request, 'Регистрация прошла успешно! Вы можете войти в систему.')
-        print('Регистрация прошла успешно! Вы можете войти в систему.')
         return redirect('login')  # Перенаправление после успешной регистрации
 
     return render(request, 'signup.html')
