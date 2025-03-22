@@ -7,9 +7,9 @@
 </head>
 <body>
     {% if user.is_authenticated %}
-        <p>Welcome, {{ user.get_username }}. Thanks for logging in.</p>
+        <p>Welcome, {{ user.get_username }}. Thanks for logging in. You can <a href=".{% url 'logout' %}">logout</a></p>
     {% else %}
-        <p>Welcome, Anonimous.</p>
+        <p>Welcome, Anonimous. You can <a href=".{% url 'login' %}">login</a> or <a href=".{% url 'register' %}">registration</a></p>
     {% endif %}
 </body>
 </html>
